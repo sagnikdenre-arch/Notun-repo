@@ -9,6 +9,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Define all your valid hackathon demo accounts here
+const VALID_CREDENTIALS = [
+  { email: "operator@routemesh.io", password: "ghosts123" },
+  { email: "medic@routemesh.io", password: "medic123" },
+  { email: "admin@routemesh.io", password: "admin123" }
+];
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Initialize state from localStorage to persist login across page reloads
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -20,12 +27,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = (email: string, password: string) => {
-    // Basic validation for the prototype
-    if (email && password.length >= 4) {
+    // Check if the entered credentials match any user in our array
+    const isValidUser = VALID_CREDENTIALS.some(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (isValidUser) {
       setIsAuthenticated(true);
       setUserEmail(email);
       
-      // Save to localStorage
+      // Save to localStorage so you don't get logged out on refresh
       localStorage.setItem("routeMesh_auth", "true");
       localStorage.setItem("routeMesh_email", email);
       return true;
