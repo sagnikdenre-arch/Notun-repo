@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 6%;
+    --foreground: 210 20% 92%;
+
+    --card: 220 30% 10%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 220 30% 10%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 215 20% 16%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 215 20% 14%;
+    --muted-foreground: 215 16% 52%;
+
+    --accent: 160 84% 39%;
+    --accent-foreground: 222 47% 6%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 215 20% 18%;
+    --input: 215 20% 18%;
+    --ring: 160 84% 39%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 220 30% 8%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 215 20% 14%;
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 215 20% 18%;
+    --sidebar-ring: 160 84% 39%;
+
+    /* Custom tokens */
+    --emerald-glow: 160 84% 39%;
+    --rose-status: 0 72% 51%;
+    --glass-bg: 220 30% 12%;
+    --glass-border: 215 20% 22%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--glass-bg) / 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border) / 0.4);
+  }
+
+  .glass-strong {
+    background: hsl(var(--glass-bg) / 0.8);
+    backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--glass-border) / 0.6);
+  }
+
+  .glow-emerald {
+    box-shadow: 0 0 20px hsl(var(--emerald-glow) / 0.15),
+                0 0 60px hsl(var(--emerald-glow) / 0.05);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px hsl(var(--emerald-glow) / 0.4);
+  }
+
+  .grid-bg {
+    background-image: 
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  @keyframes pulse-online {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsl(var(--emerald-glow) / 0.6); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 6px hsl(var(--emerald-glow) / 0); }
+  }
+
+  .animate-pulse-online {
+    animation: pulse-online 2s ease-in-out infinite;
+  }
+}
