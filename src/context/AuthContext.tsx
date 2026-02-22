@@ -2,7 +2,8 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
+  // Updated to Promise<boolean> because API calls are asynchronous
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   userEmail: string | null;
 }
@@ -10,19 +11,41 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  // Check localStorage on init to see if a token already exists
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem("token"));
+  const [userEmail, setUserEmail] = useState<string | null>(localStorage.getItem("userEmail"));
 
-  const login = (email: string, password: string) => {
-    if (email && password.length >= 4) {
-      setIsAuthenticated(true);
-      setUserEmail(email);
-      return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Save the token and email for session persistence
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userEmail", email);
+        
+        setIsAuthenticated(true);
+        setUserEmail(email);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Login error:", error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
     setIsAuthenticated(false);
     setUserEmail(null);
   };

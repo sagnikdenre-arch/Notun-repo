@@ -13,16 +13,30 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
     if (!email.includes("@")) { setError("Enter a valid email"); return; }
     if (password.length < 4) { setError("Password must be at least 4 characters"); return; }
-    if (login(email, password)) {
-      navigate("/dashboard");
-    } else {
-      setError("Authentication failed");
+    
+    setIsLoading(true); // Start loading animation/disable button
+
+    try {
+      // Await the response from your AuthContext API call
+      const success = await login(email, password); 
+      
+      if (success) {
+        navigate("/dashboard");
+      } else {
+        setError("Authentication failed. Please check your credentials.");
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.");
+    } finally {
+      setIsLoading(false); // Stop loading regardless of success or failure
     }
   };
 
@@ -51,6 +65,7 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -67,14 +82,16 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}
 
-            <Button type="submit" className="w-full">
-              Access Grid
+            {/* Button now reacts to the loading state */}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Authenticating..." : "Access Grid"}
             </Button>
           </form>
 
