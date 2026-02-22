@@ -13,7 +13,11 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+<<<<<<< HEAD
+  const [isLoading, setIsLoading] = useState(false); // New loading state
+=======
   const [isLoading, setIsLoading] = useState(false);
+>>>>>>> c33aed80c7943ef772a993fc19bac0cca0efbae3
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,6 +25,24 @@ const LoginPage = () => {
     
     if (!email.includes("@")) { setError("Enter a valid email"); return; }
     if (password.length < 4) { setError("Password must be at least 4 characters"); return; }
+<<<<<<< HEAD
+    
+    setIsLoading(true); // Start loading animation/disable button
+
+    try {
+      // Await the response from your AuthContext API call
+      const success = await login(email, password); 
+      
+      if (success) {
+        navigate("/dashboard");
+      } else {
+        setError("Authentication failed. Please check your credentials.");
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.");
+    } finally {
+      setIsLoading(false); // Stop loading regardless of success or failure
+=======
 
     setIsLoading(true);
 
@@ -32,6 +54,7 @@ const LoginPage = () => {
     } else {
       setError("Grid access denied. Verify credentials.");
       setIsLoading(false);
+>>>>>>> c33aed80c7943ef772a993fc19bac0cca0efbae3
     }
   };
 
@@ -91,6 +114,11 @@ const LoginPage = () => {
 
             {error && <p className="text-xs text-destructive text-center">{error}</p>}
 
+<<<<<<< HEAD
+            {/* Button now reacts to the loading state */}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Authenticating..." : "Access Grid"}
+=======
             <Button 
               type="submit" 
               className="mt-2 h-11 w-full bg-[#10b981] text-black hover:bg-[#059669] font-medium" 
@@ -104,6 +132,7 @@ const LoginPage = () => {
               ) : (
                 "Access Grid"
               )}
+>>>>>>> c33aed80c7943ef772a993fc19bac0cca0efbae3
             </Button>
           </form>
 
