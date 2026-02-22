@@ -5,7 +5,7 @@ import { RouteMeshLogo } from "@/components/RouteMeshLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Loader2 } from "lucide-react";
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -13,16 +13,25 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
     if (!email.includes("@")) { setError("Enter a valid email"); return; }
     if (password.length < 4) { setError("Password must be at least 4 characters"); return; }
+
+    setIsLoading(true);
+
+    // Simulate a secure network handshake (800ms delay) for realism
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     if (login(email, password)) {
       navigate("/dashboard");
     } else {
-      setError("Authentication failed");
+      setError("Grid access denied. Verify credentials.");
+      setIsLoading(false);
     }
   };
 
@@ -51,6 +60,7 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -67,14 +77,22 @@ const LoginPage = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                   required
+                  disabled={isLoading}
                 />
               </div>
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}
 
-            <Button type="submit" className="w-full">
-              Access Grid
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Authenticating...
+                </>
+              ) : (
+                "Access Grid"
+              )}
             </Button>
           </form>
 

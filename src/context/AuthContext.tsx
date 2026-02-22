@@ -10,13 +10,24 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
+  // Initialize state from localStorage to persist login across page reloads
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem("routeMesh_auth") === "true";
+  });
+  
+  const [userEmail, setUserEmail] = useState<string | null>(() => {
+    return localStorage.getItem("routeMesh_email");
+  });
 
   const login = (email: string, password: string) => {
+    // Basic validation for the prototype
     if (email && password.length >= 4) {
       setIsAuthenticated(true);
       setUserEmail(email);
+      
+      // Save to localStorage
+      localStorage.setItem("routeMesh_auth", "true");
+      localStorage.setItem("routeMesh_email", email);
       return true;
     }
     return false;
@@ -25,6 +36,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setIsAuthenticated(false);
     setUserEmail(null);
+    
+    // Clear localStorage
+    localStorage.removeItem("routeMesh_auth");
+    localStorage.removeItem("routeMesh_email");
   };
 
   return (
