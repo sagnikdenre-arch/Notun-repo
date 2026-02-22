@@ -1,20 +1,21 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export type SensorType = "Temperature" | "Voltage" | "Pressure" | "Humidity";
+// Updated to match the infrastructure theme
+export type DeviceType = "Server" | "Router" | "Camera" | "Biometric";
 
 export interface Device {
   id: string;
   name: string;
-  sensorType: SensorType;
+  deviceType: DeviceType;
   latitude: number;
   longitude: number;
   online: boolean;
-  reading: string;
+  statusPing: string;
 }
 
 interface DeviceContextType {
   devices: Device[];
-  addDevice: (device: Omit<Device, "id" | "online" | "reading">) => void;
+  addDevice: (device: Omit<Device, "id" | "online" | "statusPing">) => void;
   updateDevice: (id: string, device: Partial<Device>) => void;
   deleteDevice: (id: string) => void;
   selectedDeviceId: string | null;
@@ -23,32 +24,36 @@ interface DeviceContextType {
 
 const DeviceContext = createContext<DeviceContextType | undefined>(undefined);
 
-const sensorReadings: Record<SensorType, () => string> = {
-  Temperature: () => `${(18 + Math.random() * 15).toFixed(1)}°C`,
-  Voltage: () => `${(110 + Math.random() * 20).toFixed(1)}V`,
-  Pressure: () => `${(980 + Math.random() * 40).toFixed(1)} hPa`,
-  Humidity: () => `${(30 + Math.random() * 50).toFixed(1)}%`,
+// Generates realistic mock data when you add a new device
+const statusGenerators: Record<DeviceType, () => string> = {
+  Server: () => `${(1 + Math.random() * 9).toFixed(1)} Gbps`,
+  Router: () => `${Math.floor(5 + Math.random() * 40)} ms ping`,
+  Camera: () => (Math.random() > 0.5 ? "Recording 4K" : "Recording 1080p"),
+  Biometric: () => "Active Sync",
 };
 
+// The exact nodes from your RouteMesh dashboard screenshot
 const defaultDevices: Device[] = [
-  { id: "RM-001", name: "Substation Alpha", sensorType: "Voltage", latitude: 40.7128, longitude: -74.006, online: true, reading: "121.3V" },
-  { id: "RM-002", name: "Thermal Unit B", sensorType: "Temperature", latitude: 40.7308, longitude: -73.9975, online: true, reading: "24.7°C" },
-  { id: "RM-003", name: "Pressure Node C", sensorType: "Pressure", latitude: 40.7484, longitude: -73.9857, online: false, reading: "1012.4 hPa" },
-  { id: "RM-004", name: "Humidity Sensor D", sensorType: "Humidity", latitude: 40.7061, longitude: -74.0088, online: true, reading: "62.3%" },
-  { id: "RM-005", name: "Grid Monitor E", sensorType: "Voltage", latitude: 40.72, longitude: -74.015, online: false, reading: "0V" },
+  { id: "RM-001", name: "IT Server Room", deviceType: "Server", latitude: 22.5620, longitude: 88.4900, online: true, statusPing: "9.9 Gbps" },
+  { id: "RM-002", name: "Central Library Wi-Fi", deviceType: "Router", latitude: 22.5635, longitude: 88.4912, online: true, statusPing: "15 ms ping" },
+  { id: "RM-003", name: "Admin Block Router", deviceType: "Router", latitude: 22.5610, longitude: 88.4895, online: true, statusPing: "15 ms ping" },
+  { id: "RM-004", name: "North Gate CCTV", deviceType: "Camera", latitude: 22.5645, longitude: 88.4920, online: true, statusPing: "Recording 4K" },
+  { id: "RM-005", name: "CSE Labs Gateway", deviceType: "Router", latitude: 22.5605, longitude: 88.4930, online: true, statusPing: "14 ms ping" },
+  { id: "RM-006", name: "Main Gate Scanner", deviceType: "Biometric", latitude: 22.5615, longitude: 88.4945, online: true, statusPing: "Active Sync" },
+  { id: "RM-007", name: "Cafeteria CCTV", deviceType: "Camera", latitude: 22.5590, longitude: 88.4910, online: true, statusPing: "Recording 4K" },
 ];
 
-let counter = 6;
+let counter = 8; // Starting at 8 since 1-7 are taken by default devices
 
 export function DeviceProvider({ children }: { children: ReactNode }) {
   const [devices, setDevices] = useState<Device[]>(defaultDevices);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
 
-  const addDevice = (device: Omit<Device, "id" | "online" | "reading">) => {
+  const addDevice = (device: Omit<Device, "id" | "online" | "statusPing">) => {
     const id = `RM-${String(counter++).padStart(3, "0")}`;
-    const online = Math.random() > 0.3;
-    const reading = online ? sensorReadings[device.sensorType]() : "N/A";
-    setDevices((prev) => [...prev, { ...device, id, online, reading }]);
+    const online = Math.random() > 0.1; // 90% chance to be online for better demo look
+    const statusPing = online ? statusGenerators[device.deviceType]() : "OFFLINE";
+    setDevices((prev) => [...prev, { ...device, id, online, statusPing }]);
   };
 
   const updateDevice = (id: string, updates: Partial<Device>) => {
