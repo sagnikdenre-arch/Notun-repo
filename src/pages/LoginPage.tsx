@@ -1,90 +1,90 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { RouteMeshLogo } from "@/components/RouteMeshLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Mail } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ShieldCheck, AlertCircle } from "lucide-react";
 
-const LoginPage = () => {
+const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!email.includes("@")) { setError("Enter a valid email"); return; }
-    if (password.length < 4) { setError("Password must be at least 4 characters"); return; }
-    if (login(email, password)) {
-      navigate("/dashboard");
-    } else {
-      setError("Authentication failed");
-    }
+    setLoading(true);
+
+    // Simulate a brief network delay for realism
+    setTimeout(() => {
+      const success = login(email, password);
+      if (!success) {
+        setError("Invalid credentials. Access Denied.");
+      }
+      setLoading(false);
+    }, 800);
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center grid-bg">
-      {/* Ambient glow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[120px]" />
-
-      <div className="relative z-10 w-full max-w-sm px-4">
-        <div className="glass-strong rounded-xl p-8 glow-emerald">
-          <div className="mb-6 flex flex-col items-center gap-2">
-            <RouteMeshLogo />
-            <p className="mt-1 text-sm text-muted-foreground">Secure Grid Access</p>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 bg-dots">
+      <Card className="w-full max-w-md glass border-border/50 glow-emerald">
+        <CardHeader className="space-y-1 flex flex-col items-center">
+          <div className="p-3 bg-primary/10 rounded-full mb-2">
+            <ShieldCheck className="w-8 h-8 text-primary" />
           </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="operator@routemesh.io"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
-                  required
-                />
+          <CardTitle className="text-2xl font-bold tracking-tight">RouteMesh Admin</CardTitle>
+          <CardDescription>
+            Enter your credentials to access the campus grid
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="flex items-center gap-2 p-3 rounded-md bg-destructive/10 text-destructive text-sm animate-shake">
+                <AlertCircle size={16} />
+                {error}
               </div>
-            </div>
-
+            )}
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
-                  required
-                />
-              </div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="avrajitbanerjee09@gmail.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-background/50"
+              />
             </div>
-
-            {error && <p className="text-xs text-destructive">{error}</p>}
-
-            <Button type="submit" className="w-full">
-              Access Grid
+            <div className="space-y-2">
+              <Label htmlFor="password">Security Password</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-background/50"
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              type="submit" 
+              className="w-full font-semibold" 
+              disabled={loading}
+            >
+              {loading ? "Authenticating..." : "Authorize Access"}
             </Button>
-          </form>
-
-          <p className="mt-4 text-center text-[10px] font-mono text-muted-foreground">
-            AES-256 Encrypted · TLS 1.3
-          </p>
-        </div>
-      </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   );
 };
 
-export default LoginPage;
+export default Login;
