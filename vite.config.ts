@@ -6,15 +6,14 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: "::", // If it still fails after this, change this line to host: "0.0.0.0",
     port: 8080,
     hmr: {
       overlay: false,
     },
-    // NEW: Added proxy to route frontend API calls to the backend
     proxy: {
       '/api': {
-        target: 'http://localhost:8081', 
+        target: 'http://127.0.0.1:8081', // <--- CHANGED THIS LINE
         changeOrigin: true,
         secure: false,
       }
